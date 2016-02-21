@@ -29,15 +29,15 @@ import time
 style_provider = Gtk.CssProvider()
 
 #This is the css that is being used by Gtk
-button_style1 = """ #button1 { background-color: #FF0000; } """
-button_style2 = """ #button2 { background-color: #00FF00; } """
-button_style3 = """ #button3 { background-color: #FFFF00; } """
-button_style4 = """ #button4 { background-color: #0000FF; } """
+button_style1 = """ #button1 { background-color: #FF3333; } """
+button_style2 = """ #button2 { background-color: #00E64D; } """
+button_style3 = """ #button3 { background-color: #FFD636; } """
+button_style4 = """ #button4 { background-color: #4DA6FF; } """
 
-button_style_hover1 = """ #button1 { background-color: #000000; } """
-button_style_hover2 = """ #button2 { background-color: #000000; } """
-button_style_hover3 = """ #button3 { background-color: #000000; } """
-button_style_hover4 = """ #button4 { background-color: #000000; } """
+button_style_hover1 = """ #button1 { background-color: #E60000; } """
+button_style_hover2 = """ #button2 { background-color: #00B300; } """
+button_style_hover3 = """ #button3 { background-color: #E6B800; } """
+button_style_hover4 = """ #button4 { background-color: #007ACC; } """
 
 #Loads the css specified
 def load_css(css):
@@ -139,6 +139,8 @@ class SimonSaysActivity(activity.Activity):
     def button_clicked(self, widget, button_name):
         if self.userInput == False:
             return
+        self.display_color(button_name)
+        GLib.timeout_add(250, self.display_color, 'None')
         button_required = self.gameLoader.get_current_button()
         if button_name == button_required:
             self.gameLoader.go_to_next_button()
