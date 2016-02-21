@@ -2,7 +2,8 @@
 
 from gi.repository import GObject
 from gi.repository import Gtk 
-from gi.repository import Gdk 
+from gi.repository import Gdk
+from gi.repository import GLib
 import logging
 
 from gettext import gettext as _
@@ -20,43 +21,45 @@ from sugar3.graphics.toolbutton import ToolButton
 from sugar3.graphics.icon import Icon
 #from sugar3.graphics.texteditor import CollabTextEditor
 
+from gameloader import GameLoader
+import time
+
 #Style the different elements and widgets using CSS
 #With the help of Gtk css style providers
-
 style_provider = Gtk.CssProvider()
 
-#This is the css file that is being used by Gtk
-css = """
-    #button1 {
-        background-color: #FF0000;
-    }
-    #button2 {
-        background-color: #00FF00;
-    }
-    #button3 {
-        background-color: #FFFF00;
-    }
-    #button4 {
-        background-color: #0000FF;
-    }
-"""
+#This is the css that is being used by Gtk
+button_style1 = """ #button1 { background-color: #FF0000; } """
+button_style2 = """ #button2 { background-color: #00FF00; } """
+button_style3 = """ #button3 { background-color: #FFFF00; } """
+button_style4 = """ #button4 { background-color: #0000FF; } """
 
-style_provider.load_from_data(css)
+button_style_hover1 = """ #button1 { background-color: #000000; } """
+button_style_hover2 = """ #button2 { background-color: #000000; } """
+button_style_hover3 = """ #button3 { background-color: #000000; } """
+button_style_hover4 = """ #button4 { background-color: #000000; } """
 
-Gtk.StyleContext.add_provider_for_screen(
-    Gdk.Screen.get_default(), 
-    style_provider,
-    Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
-)
+#Loads the css specified
+def load_css(css):
+    style_provider.load_from_data(css)
+
+    Gtk.StyleContext.add_provider_for_screen(
+        Gdk.Screen.get_default(), 
+        style_provider,
+        Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+    )
 
 class SimonSaysActivity(activity.Activity):
 
     def __init__(self, handle):
         activity.Activity.__init__(self, handle)
-
+        
         # we do not have collaboration features
         # make the share option insensitive
         self.max_participants = 1
+
+        self.gameLoader = GameLoader()
+        self.userInput = False
 
         # toolbar with the new toolbar redesign
         toolbar_box = ToolbarBox()
@@ -102,32 +105,78 @@ class SimonSaysActivity(activity.Activity):
         self.title.show()
         self.grid.attach(self.title,0,0,6,1)
 
-        #self._collab = CollabWrapper(self)
-
-        #self.texteditor = CollabTextEditor(self, 1, self._collab)
-        #self.texteditor2 = CollabTextEditor(self, 2, self._collab)
-        #self.box.pack_start(self.texteditor, True, True, 0)
-        #self.box.pack_start(self.texteditor2, True, True, 0)
         self.set_canvas(self.grid)
         self.grid.show()
-        #self._collab.setup()
 
     def start_game(self, widget):
         self.button1 = Gtk.Button(label='Red')
         self.button1.set_name('button1')
+        self.button1.connect("clicked", self.button_clicked, "Red")
         self.button1.show()
         self.button2 = Gtk.Button(label='Green')
         self.button2.set_name('button2')
+        self.button2.connect("clicked", self.button_clicked, "Green")
         self.button2.show()
-        self.button3 = Gtk.Button(label='Blue')
+        self.button3 = Gtk.Button(label='Yellow')
         self.button3.set_name('button3')
+        self.button3.connect("clicked", self.button_clicked, "Yellow")
         self.button3.show()
-        self.button4 = Gtk.Button(label='Yellow')
+        self.button4 = Gtk.Button(label='Blue')
         self.button4.set_name('button4')
+        self.button4.connect("clicked", self.button_clicked, "Blue")
         self.button4.show()
 
+        css = button_style1 + button_style2 + button_style3 + button_style4
+        load_css(css)
+        
         self.grid.attach(self.button1,0,3,3,3)
         self.grid.attach(self.button2,3,3,3,3)
         self.grid.attach(self.button3,0,6,3,3)
         self.grid.attach(self.button4,3,6,3,3)
+        
+        self.play_animation()
+
+    def button_clicked(self, widget, button_name):
+        if self.userInput == False:
+            return
+        button_required = self.gameLoader.get_current_button()
+        if button_name == button_required:
+            self.gameLoader.go_to_next_button()
+            if self.gameLoader.sequence_end():
+                self.gameLoader.next_level()
+                self.play_animation()
+        else:
+            self.gameLoader.reset_game()
+            self.play_animation()
+
+    def allow_player(self):
+        self.userInput = True
+
+    def display_color(self, button):
+        css = button_style1 + button_style2 + button_style3 + button_style4
+        load_css(css)
+        if button == 'Red':
+            css = button_style_hover1 + button_style2 + button_style3 + button_style4
+            load_css(css)
+        elif button == 'Green':
+            css = button_style1 + button_style_hover2 + button_style3 + button_style4
+            load_css(css)
+        elif button == 'Yellow':
+            css = button_style1 + button_style2 + button_style_hover3 + button_style4
+            load_css(css)
+        elif button == 'Blue':
+             css = button_style1 + button_style2 + button_style3 + button_style_hover4
+             load_css(css)
+
+    def play_animation(self):
+        cnt = 0
+        self.userInput = False
+        sequence = self.gameLoader.get_sequence_list()
+        for button in sequence:
+            cnt += 1
+            GLib.timeout_add(1000*cnt, self.display_color, button)
+            GLib.timeout_add(1000*cnt+800, self.display_color, 'None')
+        cnt += 1
+        GLib.timeout_add(1000*cnt, self.display_color, 'None')
+        GLib.timeout_add(1000*cnt, self.allow_player)
 
