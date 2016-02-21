@@ -20,6 +20,35 @@ from sugar3.graphics.toolbutton import ToolButton
 from sugar3.graphics.icon import Icon
 #from sugar3.graphics.texteditor import CollabTextEditor
 
+#Style the different elements and widgets using CSS
+#With the help of Gtk css style providers
+
+style_provider = Gtk.CssProvider()
+
+#This is the css file that is being used by Gtk
+css = """
+    #button1 {
+        background-color: #FF0000;
+    }
+    #button2 {
+        background-color: #00FF00;
+    }
+    #button3 {
+        background-color: #FFFF00;
+    }
+    #button4 {
+        background-color: #0000FF;
+    }
+"""
+
+style_provider.load_from_data(css)
+
+Gtk.StyleContext.add_provider_for_screen(
+    Gdk.Screen.get_default(), 
+    style_provider,
+    Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+)
+
 class SimonSaysActivity(activity.Activity):
 
     def __init__(self, handle):
@@ -66,22 +95,39 @@ class SimonSaysActivity(activity.Activity):
         self.set_toolbar_box(toolbar_box)
         toolbar_box.show()
 	   
-        self.box = Gtk.Box(spacing = 10)
-        self.box.set_homogeneous(True)
-        self.add(self.box)
+        self.grid = Gtk.Grid(column_homogeneous=True,row_homogeneous=True,column_spacing=20,row_spacing=20)
+        self.add(self.grid)
         
+        self.title = Gtk.Label('Simon-Says')
+        self.title.show()
+        self.grid.attach(self.title,0,0,6,1)
+
         #self._collab = CollabWrapper(self)
 
         #self.texteditor = CollabTextEditor(self, 1, self._collab)
         #self.texteditor2 = CollabTextEditor(self, 2, self._collab)
         #self.box.pack_start(self.texteditor, True, True, 0)
         #self.box.pack_start(self.texteditor2, True, True, 0)
-        self.set_canvas(self.box)
-        self.box.show()
+        self.set_canvas(self.grid)
+        self.grid.show()
         #self._collab.setup()
 
     def start_game(self, widget):
         self.button1 = Gtk.Button(label='Red')
-        self.box.pack_start(self.button1, True, True, 0)
+        self.button1.set_name('button1')
         self.button1.show()
+        self.button2 = Gtk.Button(label='Green')
+        self.button2.set_name('button2')
+        self.button2.show()
+        self.button3 = Gtk.Button(label='Blue')
+        self.button3.set_name('button3')
+        self.button3.show()
+        self.button4 = Gtk.Button(label='Yellow')
+        self.button4.set_name('button4')
+        self.button4.show()
+
+        self.grid.attach(self.button1,0,3,3,3)
+        self.grid.attach(self.button2,3,3,3,3)
+        self.grid.attach(self.button3,0,6,3,3)
+        self.grid.attach(self.button4,3,6,3,3)
 
