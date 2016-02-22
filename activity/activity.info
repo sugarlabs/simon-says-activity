@@ -4,4 +4,5 @@ activity_version = 6
 bundle_id = org.sugarlabs.SimonSays
 exec = sugar-activity activity.SimonSaysActivity
 icon = activity-simonsays
+categories = game
 license = GPLv2+
