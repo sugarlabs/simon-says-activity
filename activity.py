@@ -4,6 +4,7 @@ from gi.repository import GObject
 from gi.repository import Gtk 
 from gi.repository import Gdk
 from gi.repository import GLib
+from gi.repository import Pango
 import logging
 
 from gettext import gettext as _
@@ -102,10 +103,12 @@ class SimonSaysActivity(activity.Activity):
         self.add(self.grid)
         
         self.title = Gtk.Label('Simon-Says')
+        self.title.modify_font(Pango.FontDescription("sans 32"))
         self.title.show()
         self.grid.attach(self.title,0,0,8,1)
 
         self.score = Gtk.Label('')
+        self.score.modify_font(Pango.FontDescription("sans 18"))
         self.score.show()
         self.grid.attach(self.score,0,1,8,1)
 
