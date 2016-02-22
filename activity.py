@@ -103,7 +103,11 @@ class SimonSaysActivity(activity.Activity):
         
         self.title = Gtk.Label('Simon-Says')
         self.title.show()
-        self.grid.attach(self.title,0,0,6,1)
+        self.grid.attach(self.title,0,0,8,1)
+
+        self.score = Gtk.Label('')
+        self.score.show()
+        self.grid.attach(self.score,0,1,8,1)
 
         self.set_canvas(self.grid)
         self.grid.show()
@@ -129,14 +133,16 @@ class SimonSaysActivity(activity.Activity):
         css = button_style1 + button_style2 + button_style3 + button_style4
         load_css(css)
         
-        self.grid.attach(self.button1,0,3,3,3)
-        self.grid.attach(self.button2,3,3,3,3)
-        self.grid.attach(self.button3,0,6,3,3)
-        self.grid.attach(self.button4,3,6,3,3)
+        self.score.set_text(str(self.gameLoader.get_score()))
+        self.grid.attach(self.button1,0,4,4,4)
+        self.grid.attach(self.button2,4,4,4,4)
+        self.grid.attach(self.button3,0,8,4,4)
+        self.grid.attach(self.button4,4,8,4,4)
         
         self.play_animation()
 
     def button_clicked(self, widget, button_name):
+        self.score.set_text(str(self.gameLoader.get_score()))
         if self.userInput == False:
             return
         self.display_color(button_name)
@@ -150,6 +156,7 @@ class SimonSaysActivity(activity.Activity):
         else:
             self.gameLoader.reset_game()
             self.play_animation()
+        self.score.set_text(str(self.gameLoader.get_score()))
 
     def allow_player(self):
         self.userInput = True

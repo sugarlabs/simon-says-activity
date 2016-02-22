@@ -7,6 +7,7 @@ class GameLoader:
         self.buttons = ["Red","Green","Yellow","Blue"]
         self.max_length = 1
         self.current = 0
+        self.score = 0
         self.sequence = []
         for i in range(0, self.max_length):
             self.sequence.append(self.buttons[randint(0,3)])
@@ -19,6 +20,7 @@ class GameLoader:
 
     def go_to_next_button(self):
         self.current += 1
+        self.score += 10
 
     def sequence_end(self):
         if self.current == len(self.sequence):
@@ -34,7 +36,10 @@ class GameLoader:
     def reset_game(self):
         self.max_length = 1
         self.current = 0
+        self.score = 0
         self.sequence = []
         for i in range(0, self.max_length):
             self.sequence.append(self.buttons[randint(0,3)])
-        
+       
+    def get_score(self):
+        return self.score
